@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.2.0 — 2026-08-09
+
+### Visual Studio solution
+- `NoggitDiamond.sln` + `NoggitDiamond.esproj` (Visual Studio 2022 JavaScript
+  Project System): **Build Solution** produces the Windows executable —
+  Debug builds the unpackaged `release\win-unpacked\Noggit Diamond.exe`,
+  Release builds the NSIS installer and portable exe. F5 launches the app.
+- MSBuild targets self-heal a missing `node_modules` (`npm ci`), and Clean
+  removes `dist\` and `release\`.
+- New `vs-solution` CI job runs the exact `msbuild /restore` flow on a clean
+  Windows runner (also on pull requests touching packaging files) and
+  uploads the built executables; `npm run dist:win:dir` script added.
+- [docs/VISUAL_STUDIO.md](docs/VISUAL_STUDIO.md): prerequisites, build
+  matrix, command-line usage, troubleshooting.
+
 ## 1.1.0 — 2026-08-09
 
 ### Desktop executables

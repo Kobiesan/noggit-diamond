@@ -4,6 +4,13 @@ on:
   workflow_dispatch:
   push:
     tags: ['v*']
+  pull_request:
+    paths:
+      - 'electron/**'
+      - 'electron-builder.yml'
+      - 'NoggitDiamond.sln'
+      - 'NoggitDiamond.esproj'
+      - '.github/workflows/desktop.yml'
 
 jobs:
   package:
@@ -37,4 +44,30 @@ jobs:
             release/*.dmg
             release/*.zip
             release/smoke.png
+          if-no-files-found: error
+
+  # The exact Visual Studio flow: restore + build the solution with MSBuild,
+  # which runs the MakeExecutable target and produces the Windows installer.
+  vs-solution:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: microsoft/setup-msbuild@v2
+      - run: npm ci
+      - name: Build solution (Release)
+        run: msbuild /restore NoggitDiamond.sln /p:Configuration=Release /v:minimal
+      - name: Verify executable exists
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem release/NoggitDiamond-Setup-*.exe
+          if (-not $setup) { throw "installer not produced" }
+          Write-Host "Built: $($setup.Name) ($([math]::Round($setup.Length/1MB)) MB)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: noggit-diamond-vs-solution
+          path: release/*.exe
           if-no-files-found: error

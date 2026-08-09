@@ -83,6 +83,12 @@ Actions workflow, which packages all three from one click / on version tags).
 For development, `npm run build && npm run app` launches the desktop shell directly,
 and `npm run dev` + `npm run app:dev` gives hot reload inside the native window.
 
+**With Visual Studio (Windows):** open **`NoggitDiamond.sln`** and press
+**Build** — Debug produces `release\win-unpacked\Noggit Diamond.exe`, Release
+produces the NSIS installer + portable exe; F5 launches the app. Needs the
+*JavaScript and TypeScript development* workload and Node.js on PATH — see
+[docs/VISUAL_STUDIO.md](docs/VISUAL_STUDIO.md).
+
 * **File ▸ New Map…** creates flat or procedural tiles from scratch.
 * Or **drop `.adt` files** (ideally together with the map's `.wdt`) into the viewport.
   Extract them from your client's MPQs with any MPQ tool (Ladik's MPQ Editor, etc.).

@@ -1,6 +1,6 @@
 {
   "name": "noggit-diamond",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Noggit Diamond — a modern World of Warcraft (WotLK 3.3.5a) map editor for browser and desktop. Terrain sculpting, texture painting, water, objects, procedural generation.",
   "type": "module",
   "license": "MIT",
@@ -22,7 +22,8 @@
     "app:dev": "electron . --dev",
     "dist:linux": "npm run build && electron-builder --linux",
     "dist:win": "npm run build && electron-builder --win",
-    "dist:mac": "npm run build && electron-builder --mac"
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:win:dir": "npm run build && electron-builder --win --dir"
   },
   "dependencies": {
     "three": "^0.180.0"

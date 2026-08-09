@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.6311650">
+
+  <!--
+    Noggit Diamond — Visual Studio project.
+
+    Building this project produces the Windows executable:
+      Debug   -> release\win-unpacked\Noggit Diamond.exe   (fast, unpackaged)
+      Release -> release\NoggitDiamond-Setup-<version>.exe (NSIS installer)
+                 + release\NoggitDiamond-<version>-win-<arch>.exe (portable)
+
+    F5 / Start launches the desktop app against the built bundle.
+    Requires Node.js 20+ on PATH; Visual Studio restores npm packages on
+    project open, and the EnsureNodeModules target covers command-line
+    MSBuild ("msbuild /restore NoggitDiamond.sln /p:Configuration=Release").
+  -->
+
+  <PropertyGroup>
+    <StartupCommand>npm run app</StartupCommand>
+    <!-- The build pipeline is driven by the explicit targets below. -->
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <BuildOutputFolder>$(MSBuildProjectDirectory)\release</BuildOutputFolder>
+  </PropertyGroup>
+
+  <Target Name="EnsureNodeModules"
+          BeforeTargets="MakeExecutable"
+          Condition="!Exists('$(MSBuildProjectDirectory)\node_modules')">
+    <Message Importance="high" Text="node_modules missing — running npm ci ..." />
+    <Exec Command="npm ci" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
+
+  <Target Name="MakeExecutable" AfterTargets="Build">
+    <Message Importance="high"
+             Text="Noggit Diamond: building $(Configuration) executable ..." />
+    <Exec Command="npm run dist:win:dir"
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          Condition="'$(Configuration)' != 'Release'" />
+    <Exec Command="npm run dist:win"
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          Condition="'$(Configuration)' == 'Release'" />
+    <Message Importance="high"
+             Text="Executable: $(MSBuildProjectDirectory)\release\win-unpacked\Noggit Diamond.exe"
+             Condition="'$(Configuration)' != 'Release'" />
+    <Message Importance="high"
+             Text="Installer + portable exe written to $(MSBuildProjectDirectory)\release\"
+             Condition="'$(Configuration)' == 'Release'" />
+  </Target>
+
+  <Target Name="CleanExecutable" AfterTargets="Clean">
+    <RemoveDir Directories="$(MSBuildProjectDirectory)\release;$(MSBuildProjectDirectory)\dist" />
+  </Target>
+
+</Project>
