@@ -24,7 +24,29 @@ const dropHint = document.getElementById('drop-hint')!;
 
 const editor = new Editor();
 const fly = new FlyCamera(canvas);
-const renderer = new AppRenderer(editor, canvas);
+
+function fatal(message: string): never {
+  const overlay = document.createElement('div');
+  overlay.style.cssText =
+    'position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;gap:10px;' +
+    'align-items:center;justify-content:center;background:#14161a;color:#d7dae0;' +
+    'font:15px/1.6 system-ui;text-align:center;padding:40px';
+  overlay.innerHTML =
+    `<div style="font-size:40px">💎</div><b>Noggit Diamond could not start</b>` +
+    `<div style="color:#8b919c;max-width:520px">${message}</div>`;
+  document.body.appendChild(overlay);
+  throw new Error(message);
+}
+
+let renderer: AppRenderer;
+try {
+  renderer = new AppRenderer(editor, canvas);
+} catch {
+  fatal(
+    'WebGL is unavailable. The 3D viewport needs WebGL 2 — update your graphics ' +
+      'drivers, or enable hardware acceleration in your browser settings.',
+  );
+}
 const topbar = new Topbar(editor, renderer, fly);
 new Toolbar(editor);
 new Sidebar(editor);

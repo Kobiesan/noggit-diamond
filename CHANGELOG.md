@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.1.0 — 2026-08-09
+
+### Desktop executables
+- Electron desktop shell: native window with the in-app menus, native save
+  dialogs for ADT/WDT/WDL/heightmap exports, external links opened in the
+  system browser, all network requests blocked (fully offline app).
+- `electron-builder` packaging: Windows NSIS installer + portable `.exe`,
+  macOS `.dmg`/`.zip`, Linux AppImage (`npm run dist:win|mac|linux`).
+- **Desktop builds** GitHub Actions workflow packages all three platforms on
+  version tags or manual dispatch, with a headless launch smoke test of the
+  packaged Linux binary.
+- Software-WebGL fallback flags so the app runs on machines and VMs without
+  GPU acceleration; the web app now shows a clear error screen instead of a
+  dead UI when WebGL is genuinely unavailable.
+- App icon, `NOGGIT_SMOKE` headless self-test hook for CI.
+
 ## 1.0.0 — 2026-08-09
 
 First release: a complete, from-scratch reimplementation of the Noggit WoW map editor
