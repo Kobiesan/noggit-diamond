@@ -1,0 +1,40 @@
+appId: io.github.kobiesan.noggitdiamond
+productName: Noggit Diamond
+copyright: MIT — Noggit Diamond contributors
+
+directories:
+  buildResources: build
+  output: release
+
+files:
+  - dist/**
+  - electron/**
+  - build/icon.png
+  - package.json
+
+npmRebuild: false
+
+linux:
+  target:
+    - AppImage
+  category: Graphics
+  syncDesktopName: true
+  artifactName: NoggitDiamond-${version}-linux-${arch}.${ext}
+
+win:
+  target:
+    - nsis
+    - portable
+  artifactName: NoggitDiamond-${version}-win-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  artifactName: NoggitDiamond-Setup-${version}.${ext}
+
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.graphics-design
+  artifactName: NoggitDiamond-${version}-mac-${arch}.${ext}

@@ -18,7 +18,7 @@ workflow map-makers know and fixes the foundations:
 
 | | Classic Noggit | **Noggit Diamond** |
 |---|---|---|
-| Platform | Windows build (fragile) | Any browser, no install |
+| Platform | Windows build (fragile) | Any browser — or native desktop builds for Windows/macOS/Linux |
 | Undo/redo | Partial, unreliable | Every stroke, transactional (200 steps) |
 | File safety | Can corrupt unknown chunks | Byte-preserving round trip, unknown chunks kept verbatim |
 | WDL (distant terrain) | Never updated → far-view mismatch | Regenerated automatically on save |
@@ -62,10 +62,26 @@ operation from JavaScript (`nd.raise`, `nd.paint`, `nd.water`, `nd.generate`,
 
 ## Quick start
 
+**In the browser:**
+
 ```bash
 npm install
 npm run dev          # → http://localhost:5173
 ```
+
+**As a desktop app** (Electron — native window, native save dialogs, works offline):
+
+```bash
+npm install
+npm run dist:linux   # → release/NoggitDiamond-<version>-linux-x86_64.AppImage
+npm run dist:win     # → release/NoggitDiamond-Setup-<version>.exe (+ portable .exe)
+npm run dist:mac     # → release/NoggitDiamond-<version>-mac-<arch>.dmg
+```
+
+Each `dist:*` command must run on its own OS (or use the **Desktop builds** GitHub
+Actions workflow, which packages all three from one click / on version tags).
+For development, `npm run build && npm run app` launches the desktop shell directly,
+and `npm run dev` + `npm run app:dev` gives hot reload inside the native window.
 
 * **File ▸ New Map…** creates flat or procedural tiles from scratch.
 * Or **drop `.adt` files** (ideally together with the map's `.wdt`) into the viewport.

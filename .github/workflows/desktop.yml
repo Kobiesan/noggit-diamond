@@ -1,0 +1,40 @@
+name: Desktop builds
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # Builds the host OS's targets from electron-builder.yml
+      # (Linux AppImage / Windows NSIS+portable / macOS dmg+zip).
+      - run: npx electron-builder --publish never
+      - name: Smoke-test packaged app (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          NOGGIT_SMOKE=$PWD/release/smoke.png xvfb-run -a \
+            release/linux-unpacked/noggit-diamond --no-sandbox
+      - uses: actions/upload-artifact@v4
+        with:
+          name: noggit-diamond-${{ matrix.os }}
+          path: |
+            release/*.AppImage
+            release/*.exe
+            release/*.dmg
+            release/*.zip
+            release/smoke.png
+          if-no-files-found: error
