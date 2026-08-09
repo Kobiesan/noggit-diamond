@@ -258,7 +258,7 @@ function subChunk(
   mcnk: Uint8Array,
   ofs: number,
   expected: string,
-): { data: Uint8Array; size: number } | null {
+): { data: Uint8Array; size: number; base: number } | null {
   if (ofs <= 0) return null;
   for (const base of [ofs, ofs + 8]) {
     if (base + 8 > mcnk.length) continue;
@@ -272,7 +272,11 @@ function subChunk(
       mcnk[base + 4] | (mcnk[base + 5] << 8) | (mcnk[base + 6] << 16) | (mcnk[base + 7] << 24);
     const start = base + 8;
     const avail = Math.max(0, mcnk.length - start);
-    return { data: mcnk.subarray(start, start + Math.min(size >>> 0, avail)), size: size >>> 0 };
+    return {
+      data: mcnk.subarray(start, start + Math.min(size >>> 0, avail)),
+      size: size >>> 0,
+      base,
+    };
   }
   return null;
 }
@@ -297,13 +301,12 @@ function parseMcnk(chunkBytes: Uint8Array, bigAlphaHint: boolean | null): McnkCh
   const mcnr = subChunk(chunkBytes, h.ofsNormal, 'MCNR');
   if (mcnr) {
     // The size field famously lies (says 435, payload is 448).
-    const nrStart = h.ofsNormal >= 0 ? 0 : 0;
-    const bytes = mcnr.data.length >= 435 ? mcnr.data : null;
-    if (bytes) {
-      normals = new Int8Array(bytes.buffer, bytes.byteOffset, 435).slice();
+    if (mcnr.data.length >= 435) {
+      normals = new Int8Array(mcnr.data.buffer, mcnr.data.byteOffset, 435).slice();
     }
-    // Trailing pad lives beyond the declared payload; fetch from raw bytes.
-    const padStart = (h.ofsNormal < chunkBytes.length ? h.ofsNormal : 0) + 8 + 435;
+    // The 13 trailing pad bytes live beyond the declared payload,
+    // relative to wherever the sub-chunk actually matched.
+    const padStart = mcnr.base + 8 + 435;
     if (padStart + 13 <= chunkBytes.length) {
       normalsPad = chunkBytes.slice(padStart, padStart + 13);
     }

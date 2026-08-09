@@ -81,8 +81,7 @@ export function decodeAlphaCompressed(
     }
     const control = data[inPos++];
     const fill = (control & 0x80) !== 0;
-    let count = control & 0x7f;
-    if (count === 0) count = 0; // zero-count controls are skipped
+    const count = control & 0x7f;
     if (fill) {
       if (inPos >= data.length) throw new Error('compressed alpha map truncated');
       const value = data[inPos++];

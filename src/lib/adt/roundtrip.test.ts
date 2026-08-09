@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { BinaryWriter } from '../binary/writer';
 import { createBlankAdt } from './builder';
 import { parseAdt } from './parser';
 import { serializeAdt } from './serializer';
@@ -62,6 +63,12 @@ function makeRichAdt(bigAlpha: boolean): AdtDoc {
     const c = doc.chunks[3];
     c.soundEmitters = mulberryBytes(28 * 2, 4);
     c.soundEmitterCount = 2;
+    // Legacy MCLQ preserved verbatim (raw includes its own chunk header).
+    const lq = new BinaryWriter();
+    lq.chunk('MCLQ', mulberryBytes(48, 5));
+    c.liquidLegacy = lq.toUint8Array();
+    // Non-zero MCNR trailing pad must survive the round trip too.
+    c.normalsPad = mulberryBytes(13, 6);
   }
 
   // Models + placements.
@@ -178,6 +185,8 @@ function expectDocsEqual(a: AdtDoc, b: AdtDoc): void {
       expect(cb.layers[l].alpha, `chunk ${i} layer ${l} alpha`).toEqual(ca.layers[l].alpha);
     }
     expect(cb.soundEmitters).toEqual(ca.soundEmitters);
+    expect(cb.liquidLegacy, `chunk ${i} MCLQ`).toEqual(ca.liquidLegacy);
+    expect(cb.normalsPad, `chunk ${i} MCNR pad`).toEqual(ca.normalsPad);
   }
   if (a.water === null) {
     expect(b.water).toBeNull();
